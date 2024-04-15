@@ -1,4 +1,4 @@
-const mapDBSongs = ({
+const mapDBSongsModel = ({
   id,
   title,
   year,
@@ -17,5 +17,5 @@ const mapDBSongs = ({
 });
 
 module.exports = {
-  mapDBSongs,
+  mapDBSongsModel,
 };
