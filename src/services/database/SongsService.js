@@ -1,6 +1,7 @@
 const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
 const InvariantError = require('../../exceptions/InvariantError');
+const { mapGetSongs } = require('../../utils');
 
 class SongsService {
   constructor() {
@@ -12,7 +13,7 @@ class SongsService {
   }) {
     const id = `song-${nanoid(16)}`;
     const query = {
-      text: 'INSERT INTO songs VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING id',
+      text: 'INSERT INTO songs VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id',
       values: [id, title, year, performer, genre, duration, albumId],
     };
 
@@ -22,6 +23,18 @@ class SongsService {
     }
 
     return result.rows[0].id;
+  }
+
+  async getSongs() {
+    const query = {
+      text: 'SELECT * FROM songs',
+    };
+
+    const result = await this._pool.query(query);
+    if (!result.rowCount) {
+      throw new InvariantError('Lagu tidak ditemukan');
+    }
+    return result.rows.map(mapGetSongs);
   }
 }
 

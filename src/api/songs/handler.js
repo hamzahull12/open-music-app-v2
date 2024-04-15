@@ -19,6 +19,16 @@ class SongsHandler {
     }).code(201);
     return response;
   }
+
+  async getSongsHandler() {
+    const song = await this._service.getSongs();
+    return {
+      status: 'success',
+      data: {
+        songs: song,
+      },
+    };
+  }
 }
 
 module.exports = SongsHandler;
