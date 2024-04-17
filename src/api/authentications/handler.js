@@ -12,7 +12,7 @@ class AuthenticationsHandler {
 
   //= ============login users with auth==================//
 
-  async PostLoginUserHandler(request, h) {
+  async postLoginUserHandler(request, h) {
     this._validator.PostValidateAuthentication(request.payload);
 
     const id = await this._usersService.verifyUserCredential(request.payload);
@@ -27,6 +27,22 @@ class AuthenticationsHandler {
       },
     }).code(201);
     return response;
+  }
+
+  async putRefreshTokenHandler(request) {
+    this._validator.PutValidateAuthentication(request.payload);
+
+    const { refreshToken } = request.payload;
+    await this._authenticationsService.verifyRefreshToken(refreshToken);
+    const id = this._tokenManager.verifyRefreshToken(refreshToken);
+    const accessToken = this._tokenManager.generateAccessToken({ id });
+
+    return {
+      status: 'success',
+      data: {
+        accessToken,
+      },
+    };
   }
 }
 
