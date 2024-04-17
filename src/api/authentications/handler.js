@@ -16,9 +16,9 @@ class AuthenticationsHandler {
     this._validator.PostValidateAuthentication(request.payload);
 
     const id = await this._usersService.verifyUserCredential(request.payload);
-    const accessToken = this._tokenManager.generateAccessToken(id);
-    const refreshToken = this._tokenManager.generateAccessToken(id);
-
+    const accessToken = this._tokenManager.generateAccessToken({ id });
+    const refreshToken = this._tokenManager.generateRefreshToken({ id });
+    await this._authenticationsService.addRefreshToken(refreshToken);
     const response = h.response({
       status: 'success',
       data: {
