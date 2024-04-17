@@ -34,7 +34,7 @@ class AuthenticationsHandler {
 
     const { refreshToken } = request.payload;
     await this._authenticationsService.verifyRefreshToken(refreshToken);
-    const id = this._tokenManager.verifyRefreshToken(refreshToken);
+    const id = this._tokenManager.verifySignatureRefreshToken(refreshToken);
     const accessToken = this._tokenManager.generateAccessToken({ id });
 
     return {
