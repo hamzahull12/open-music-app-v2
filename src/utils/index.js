@@ -26,7 +26,18 @@ const mapGetSongs = ({
   performer,
 });
 
+const MapGetPlaylists = ({
+  id,
+  name,
+  username,
+}) => ({
+  id,
+  name,
+  username,
+});
+
 module.exports = {
   mapDBSongsModel,
   mapGetSongs,
+  MapGetPlaylists,
 };
