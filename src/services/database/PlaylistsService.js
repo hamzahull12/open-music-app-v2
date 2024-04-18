@@ -37,9 +37,15 @@ class PlaylistsService {
     return result.rows.map(MapGetPlaylists);
   }
 
+  async deletePlaylist(owner) {
+    const query = {
+
+    }
+  }
+
   async verifyOwnerPlaylist(id, owner) {
     const query = {
-      text: 'SELECT * FROM playlists',
+      text: 'SELECT * FROM playlists WHERE id = $1',
       values: [id],
     };
 
