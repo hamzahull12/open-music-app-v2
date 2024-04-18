@@ -2,8 +2,8 @@ const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotfoundError = require('../../exceptions/NotFoundError');
-const AuthenticationsError = require('../../exceptions/AuthenticationError');
 const { MapGetPlaylists } = require('../../utils');
+const AuthorizationError = require('../../exceptions/AuthorizationError');
 
 class PlaylistsService {
   constructor() {
@@ -37,9 +37,15 @@ class PlaylistsService {
     return result.rows.map(MapGetPlaylists);
   }
 
-  async deletePlaylist(owner) {
+  async deletePlaylist(id) {
     const query = {
+      text: 'DELETE FROM playlists WHERE id = $1',
+      values: [id],
+    };
 
+    const result = await this._pool.query(query);
+    if (!result.rowCount) {
+      throw new NotfoundError('Gagal menghapus playlis');
     }
   }
 
@@ -56,7 +62,7 @@ class PlaylistsService {
 
     const playlists = result.rows[0];
     if (playlists.owner !== owner) {
-      throw new AuthenticationsError('Anda tidak berhak mengakses resource ini');
+      throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
     }
   }
 }
