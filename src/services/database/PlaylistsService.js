@@ -49,6 +49,20 @@ class PlaylistsService {
     }
   }
 
+  async addSongsInPlaylist(playlistId, songId) {
+    await this.checkSongIfExist(songId);
+    const id = `playlist_songs-${nanoid(16)}`;
+    const query = {
+      text: 'INSERT INTO playlist_songs VALUES($1, $2, $3) RETURNING id',
+      values: [id, playlistId, songId],
+    };
+
+    const result = await this._pool.query(query);
+    if (!result.rowCount) {
+      throw new InvariantError('gagal memasukan lagu pad playlists');
+    }
+  }
+
   async verifyOwnerPlaylist(id, owner) {
     const query = {
       text: 'SELECT * FROM playlists WHERE id = $1',
@@ -63,6 +77,18 @@ class PlaylistsService {
     const playlists = result.rows[0];
     if (playlists.owner !== owner) {
       throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
+    }
+  }
+
+  async checkSongIfExist(songId) {
+    const query = {
+      text: 'SELECT * FROM songs WHERE id = $1',
+      values: [songId],
+    };
+
+    const result = await this._pool.query(query);
+    if (!result.rowCount) {
+      throw new NotfoundError('Lagu tidak ditemukan');
     }
   }
 }

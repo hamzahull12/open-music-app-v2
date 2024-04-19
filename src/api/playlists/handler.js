@@ -37,15 +37,32 @@ class PLaylistsHandler {
   }
 
   async deletePlaylistHandler(request) {
-    const { id } = request.params;
+    const { id: playlistId } = request.params;
     const { id: credentialId } = request.auth.credentials;
-    await this._service.verifyOwnerPlaylist(id, credentialId);
-    await this._service.deletePlaylist(id);
+    await this._service.verifyOwnerPlaylist(playlistId, credentialId);
+    await this._service.deletePlaylist(playlistId);
 
     return {
       status: 'success',
       message: 'Playlists berhasil dihapus',
     };
+  }
+
+  async postSongInPlaylistHandler(request, h) {
+    this._validator.validatePlaylistSongPayload(request.payload);
+
+    const { id: playlistId } = request.params;
+    const { songId } = request.payload;
+    const { id: credentialId } = request.auth.credentials;
+
+    await this._service.verifyOwnerPlaylist(playlistId, credentialId);
+    await this._service.addSongsInPlaylist(playlistId, songId);
+
+    const response = h.response({
+      status: 'success',
+      message: 'Lagu berhasil di tambahkan pada playlist',
+    }).code(201);
+    return response;
   }
 }
 
