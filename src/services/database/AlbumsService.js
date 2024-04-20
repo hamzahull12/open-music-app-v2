@@ -27,7 +27,8 @@ class AlbumsService {
   async getAlbumsById(id) {
     const query = {
       text: `SELECT albums.*,
-      COALESCE(json_agg(json_build_object('id', songs.id, 'title', songs.title, 'performer', songs.performer)) 
+      COALESCE(json_agg(json_build_object
+      ('id', songs.id, 'title', songs.title, 'performer', songs.performer))
       FILTER (WHERE songs.id IS NOT NULL), '[]') AS songs
       FROM albums
       LEFT JOIN songs ON albums.id = songs.album_id

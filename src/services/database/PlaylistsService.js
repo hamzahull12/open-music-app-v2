@@ -24,7 +24,7 @@ class PlaylistsService {
     return result.rows[0].id;
   }
 
-  async getPlaylists({ owner }) {
+  async getPlaylists(owner) {
     const query = {
       text: `SELECT playlists.id, playlists.name, users.username
       FROM playlists
@@ -39,7 +39,7 @@ class PlaylistsService {
 
   async deletePlaylist(id) {
     const query = {
-      text: 'DELETE FROM playlists WHERE id = $1',
+      text: 'DELETE FROM playlists WHERE id = $1 RETURNING id',
       values: [id],
     };
 
@@ -60,6 +60,43 @@ class PlaylistsService {
     const result = await this._pool.query(query);
     if (!result.rowCount) {
       throw new InvariantError('gagal memasukan lagu pad playlists');
+    }
+  }
+
+  async getSongInPLaylist(playlistId) {
+    const query = {
+      text: `SELECT 
+      playlists.id, 
+      playlists.name,
+      users.username, 
+      array_agg(json_build_object('id', songs.id, 'title', songs.title, 'performer', songs.performer)) AS songs
+      FROM playlists 
+      JOIN users ON playlists.owner = users.id 
+      JOIN playlist_songs ON playlists.id = playlist_songs.playlist_id 
+      JOIN songs ON playlist_songs.song_id = songs.id 
+      WHERE playlists.id = $1
+      GROUP BY playlists.id,
+      users.username`,
+      values: [playlistId],
+    };
+
+    const result = await this._pool.query(query);
+    if (!result.rowCount) {
+      throw new NotfoundError('playlist tidak ditemukan');
+    }
+
+    return result.rows[0];
+  }
+
+  async deleteSongInPlaylist(songId) {
+    const query = {
+      text: 'DELETE FROM playlist_songs WHERE song_id = $1 RETURNING id',
+      values: [songId],
+    };
+
+    const result = await this._pool.query(query);
+    if (!result.rowCount) {
+      throw new InvariantError('Gagal menhapus Lagu pad playlist');
     }
   }
 
