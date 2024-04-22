@@ -6,8 +6,9 @@ const { MapGetPlaylists } = require('../../utils');
 const AuthorizationError = require('../../exceptions/AuthorizationError');
 
 class PlaylistsService {
-  constructor() {
+  constructor(collaborationsService) {
     this._pool = new Pool();
+    this._collaborationsService = collaborationsService;
   }
 
   async addPlaylist({ name, owner }) {
@@ -114,6 +115,22 @@ class PlaylistsService {
     const playlists = result.rows[0];
     if (playlists.owner !== owner) {
       throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
+    }
+  }
+
+  async verifyPlaylistAccess(playlistId, userId) {
+    try {
+      await this.verifyOwnerPlaylist(playlistId, userId);
+    } catch (error) {
+      if (error instanceof NotfoundError) {
+        throw error;
+      }
+
+      try {
+        await this._collaborationsService.verifyCollaborator(playlistId, userId);
+      } catch {
+        throw error;
+      }
     }
   }
 
