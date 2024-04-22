@@ -109,7 +109,7 @@ class PlaylistsService {
 
     const result = await this._pool.query(query);
     if (!result.rowCount) {
-      throw new NotfoundError('id tidak ditemukan');
+      throw new NotfoundError('playlist tidak ditemukan');
     }
 
     const playlists = result.rows[0];
