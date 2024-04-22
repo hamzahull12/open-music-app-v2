@@ -26,6 +26,20 @@ class CollaborationsHandler {
     }).code(201);
     return response;
   }
+
+  async deleteCollaborationHandler(request) {
+    this._validator.collaborationValidatePayload(request.payload);
+
+    const { id: credentialId } = request.auth.credentials;
+    const { playlistId, userId } = request.payload;
+
+    await this._playlistsService.verifyOwnerPlaylist(playlistId, credentialId);
+    await this._collaborationsService.deleteCollaboration(playlistId, userId);
+    return {
+      status: 'success',
+      message: 'collaborator berhasil dihapus',
+    };
+  }
 }
 
 module.exports = CollaborationsHandler;
