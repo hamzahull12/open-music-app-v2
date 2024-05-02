@@ -102,6 +102,24 @@ class PlaylistsService {
     }
   }
 
+  // =========== options playlist song activities ============ //
+
+  async addPlaylistSongActivities(playlistId, songId, credentialId) {
+    const id = `activities-${nanoid(16)}`;
+    const action = 'add';
+    const time = new Date().toISOString();
+
+    const query = {
+      text: 'INSERT INTO playlist_song_activities VALUES($1, $2, $3, $4, $5, $6) RETURNING id',
+      values: [id, playlistId, songId, credentialId, action, time],
+    };
+
+    const result = await this._pool.query(query);
+    if (!result.rowCount) {
+      throw new InvariantError('Gagal menambahkan activities');
+    }
+  }
+
   async verifyOwnerPlaylist(id, owner) {
     const query = {
       text: 'SELECT * FROM playlists WHERE id = $1',

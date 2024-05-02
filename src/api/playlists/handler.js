@@ -57,6 +57,7 @@ class PLaylistsHandler {
 
     await this._service.verifyPlaylistAccess(playlistId, credentialId);
     await this._service.addSongsInPlaylist(playlistId, songId);
+    await this._service.addPlaylistSongActivities(playlistId, songId, credentialId);
 
     const response = h.response({
       status: 'success',
